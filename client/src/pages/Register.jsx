@@ -23,7 +23,7 @@ const handleSubmit = async (e) =>{
     // console.log(user)
     try {
       const response = await fetch(
-        "http://localhost:3000/api/register",
+        "https://task-1-login-and-singup.onrender.com/api/register",
         {
           method: "POST",
           headers: {
