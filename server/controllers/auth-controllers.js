@@ -1,7 +1,5 @@
 const User = require('../models/user-model')
 const bcryptjs = require('bcryptjs');
-const jwt = require('jsonwebtoken')
-const { sendMail } = require('../utils/mail');
 
 // const register = async (req,res) =>{
 //     try {
@@ -116,51 +114,7 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-const sendVerificationMail = async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
-
-  if (!user) {
-      return res.status(400).send('User not found');
-  }
-
-  const verificationToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-  const verificationUrl = `http://localhost:3000/verify-email?token=${verificationToken}`;
-
-  const emailOptions = {
-      from: 'gautamkum4r@gmail.com',
-      to: email,
-      subject: 'Email Verification',
-      text: `Click the following link to verify your email: ${verificationUrl}`,
-  };
-
-  try {
-      await sendMail(emailOptions);
-      res.send('Verification email sent');
-  } catch (error) {
-      res.status(500).send('Failed to send email');
-  }
-}
-
-const verifyEmail = async (req, res) => {
-  const { token } = req.query;
-  try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      const user = await User.findById(decoded.id);
-
-      if (!user) {
-          return res.status(400).send('User not found');
-      }
-
-      user.isVerified = true;
-      await user.save();
-
-      res.send('Email verified successfully');
-  } catch (error) {
-      res.status(400).send('Invalid or expired token');
-  }
-}
-module.exports = {register,login,getAllUsers,sendVerificationMail,verifyEmail};
+module.exports = {register,login,getAllUsers};
 
 
 
