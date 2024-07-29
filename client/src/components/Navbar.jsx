@@ -7,13 +7,11 @@ const Navbar = () => {
         Task 1 - Login and SignUp
       </h2>
       <div className="flex gap-5">
-        <Link to="/" className="text-xl hover:underline">
-          Home
-        </Link>
+    
         <Link to="/login" className="text-xl hover:underline">
           Login
         </Link>
-        <Link to="/register" className="text-xl hover:underline">
+        <Link to="/" className="text-xl hover:underline">
           Signup
         </Link>
       </div>
