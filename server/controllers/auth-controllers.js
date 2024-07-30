@@ -1,70 +1,76 @@
 const User = require('../models/user-model')
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer');
 
-// const register = async (req,res) =>{
-//     try {
-        
-//         const {username,email,phone,password} = req.body;
-
-//         const userExists = await User.findOne({email: email});
-
-//         if(userExists){
-//             return res.status(400).json({ message: "Email already exists" });
-//         }
-//         const salt = await bcryptjs.genSalt(10);
-//         const hashedPassword = await bcryptjs.hash(password, salt);
-        
-//         const userCreated = await User.create({username,email,phone,password:hashedPassword,token:token});
-//         const token = await userCreated.generateToken();
-//         const options = {
-//           httpOnly: true,
-//           secure: true
-//       }
-//         res.status(201).cookie("JwtToken", token, options).json({
-//           message:"Registeration successful",
-//           token: token,
-//           userId: userCreated._id.toString(),
-//         });
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'gautamraaz936@gmail.com',
+    pass: 'crfkzvmtvszctovq',
+  },
+});
 const register = async (req, res) => {
   try {
-      const { username, email, phone, password } = req.body;
+    const { username, email, password } = req.body;
 
-      const userExists = await User.findOne({ email: email });
+    // Check if the user already exists
+    const userExists = await User.findOne({ email: email });
+    if (userExists) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
 
-      if (userExists) {
-          return res.status(400).json({ message: "Email already exists" });
-      }
+    // Hash the password
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
 
-      const salt = await bcryptjs.genSalt(10);
-      const hashedPassword = await bcryptjs.hash(password, salt);
+    // Create the user
+    const userCreated = await User.create({ username, email, password: hashedPassword });
 
-      // Create the user first
-      const userCreated = await User.create({ username, email, phone, password: hashedPassword });
+    // Generate token
+    const token = jwt.sign({ email: userCreated.email }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+    const url = `http://localhost:3000/verify/${token}`;
+    console.log(`Verification URL: ${url}`); // Log the URL for testing
+    const emailResponse = await transporter.sendMail({
+      to: email,
+      subject: 'Verify Email',
+      html: `<a href="${url}">Verify your email</a>`,
+    });
 
-      // Now generate the token based on the created user
-      const token = await userCreated.generateToken();
+    console.log("Email sent: ", emailResponse);
 
-      const options = {
-          httpOnly: true,
-          secure: true
-      };
+    // Options for the cookie
+    const options = {
+      httpOnly: true,
+      secure: true, // This should be true in production (HTTPS)
+    };
 
-      res.status(201)
-          .cookie("JwtToken", token, options)
-          .json({
-              message: "Registration successful",
-              token: token,
-              userId: userCreated._id.toString(),
-          });
+    // Respond with the token and user details
+    res.status(201).cookie("JwtToken", token, options).json({
+      message: "Registration successful",
+      token: token,
+      userId: userCreated._id.toString(),
+    });
   } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "Server error" });
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+const verifyToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { email } = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    await User.updateOne({ email }, { isVerified: true });
+    res.redirect('http://localhost:5173/verifyPage');
+    
+  }
+  catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
 
 const login = async (req, res) => {
   try {
@@ -83,7 +89,7 @@ const login = async (req, res) => {
       const options = {
         httpOnly: true,
         secure: true
-    }
+      }
 
       res.status(200).cookie("JwtToken", token, options).json({
         message: "Login successful",
@@ -102,19 +108,19 @@ const login = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-      
-  const users = await User.find({}); 
-  
-  return res.json({
+
+    const users = await User.find({});
+
+    return res.json({
       message: "Users fetched successfully",
       data: users
-  });
+    });
   } catch (error) {
-      throw new Error(error);
+    throw new Error(error);
   }
 }
 
-module.exports = {register,login,getAllUsers};
+module.exports = { register, login, getAllUsers,verifyToken };
 
 
 

@@ -23,7 +23,7 @@ const handleSubmit = async (e) =>{
     // console.log(user)
     try {
       const response = await fetch(
-        "https://task-1-login-and-singup.onrender.com/api/register",
+        "http://localhost:3000/api/register",
         {
           method: "POST",
           headers: {
@@ -40,7 +40,7 @@ const handleSubmit = async (e) =>{
         
 
         setUser({ username: "", email: "", password: "" });
-        navigate("/login");
+        // navigate("/verify");
       }
       else{
         alert("Registration Failed");

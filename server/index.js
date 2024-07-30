@@ -2,12 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const connectDb = require('./utils/Db');
-const { register, login, getAllUsers} = require('./controllers/auth-controllers');
+const { register, login, getAllUsers, verifyToken} = require('./controllers/auth-controllers');
 const cors = require('cors')
 
 
 const corsOptions = {
-  origin: "https://task-1-login-and-singup.vercel.app",
+  origin: "http://localhost:5173",
   method: "GET,POST,PUT, DELETE, PATCH,HEAD",
   Credential: true,
 };
@@ -20,7 +20,7 @@ app.get('/', (req,res)=>{
 app.post('/api/register',register)
 app.post('/api/login',login)
 app.get('/api/users',getAllUsers)
-
+app.get('/verify/:token',verifyToken)
 const PORT = process.env.PORT || 3000;
 
 connectDb().then(() => {

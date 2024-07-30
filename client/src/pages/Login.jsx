@@ -19,7 +19,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        "https://task-1-login-and-singup.onrender.com/api/login",
+        "http://localhost:3000/api/login",
         {
           method: "POST",
           headers: {
@@ -38,7 +38,7 @@ const Login = () => {
           email: "",
           password: "",
         });
-        navigate("/");
+        navigate("/loginPage");
       }
       else {
         alert("Login Failed")
