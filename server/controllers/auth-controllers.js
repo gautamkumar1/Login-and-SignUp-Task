@@ -14,7 +14,9 @@ const transporter = nodemailer.createTransport({
 const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
+    if(!username || !email|| !password){
+      return res.status(401).json({message:"All fields are required"})
+    }
     // Check if the user already exists
     const userExists = await User.findOne({ email: email });
     if (userExists) {
@@ -54,7 +56,7 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Error While Registeration" });
   }
 };
 
@@ -75,6 +77,9 @@ const verifyToken = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    if(!email|| !password){
+      res.status(401).json({message:"All fields are required"})
+    }
     // Check if the user exists in the database
     const userExists = await User.findOne({ email: email });
     if (!userExists) {

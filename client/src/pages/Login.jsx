@@ -19,7 +19,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/login",
+        "http://116.202.210.102:9000/api/login",
         {
           method: "POST",
           headers: {

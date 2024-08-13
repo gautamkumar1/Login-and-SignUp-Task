@@ -10,7 +10,7 @@ const Verify = () => {
     const verifyEmail = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/verify/${token}`,
+          `http://116.202.210.102:9000/verify/${token}`,
           {
             method: "GET",
             headers: {

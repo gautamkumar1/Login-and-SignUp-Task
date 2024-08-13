@@ -7,7 +7,8 @@ const cors = require('cors')
 
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5179",
+  // origin: "http://116.202.210.102:5180",
   method: "GET,POST,PUT, DELETE, PATCH,HEAD",
   Credential: true,
 };
@@ -21,7 +22,7 @@ app.post('/api/register',register)
 app.post('/api/login',login)
 app.get('/api/users',getAllUsers)
 app.get('/verify/:token',verifyToken)
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 9000;
 
 connectDb().then(() => {
   app.listen(PORT, () => {
